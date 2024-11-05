@@ -1,5 +1,7 @@
 # stock-ticker-python
 
+# ABOUT
+Uses data from TwelveData['https://twelvedata.com/'] to get stock ticker data. Integrated with ChatGPT['https://platform.openai.com/docs/overview'] to analyze and summarize stock movement.
 
 
 # TASK LIST 
