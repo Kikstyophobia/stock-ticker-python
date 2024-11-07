@@ -1,44 +1,44 @@
+from dotenv import load_dotenv
+import os
 import requests
-import time
-import constants
+from datetime import datetime, timedelta
+import pandas as pd
+import numpy as py
+import mplfinance as mpf
 
 
-api_key = constants.TWELVEDATA_API_KEY
+load_dotenv()
+api_key = os.getenv("TWELVEDATA_API_KEY")
+
+
+global_data_list = []
 
 
 def get_stock_data(stock_list):
     stock_data_list = []
+    today = datetime.today().strftime('%Y-%m-%d')
+    five_days_ago = datetime.today() - timedelta(5)
+    format_five_days_ago = five_days_ago.strftime('%Y-%m-%d')
 
-    # url = f"https://api.twelvedata.com/price?symbol={stock_list}&apikey={api}"
     for stock in stock_list:
-        url = f"https://api.twelvedata.com/quote?symbol={stock}&apikey={api_key}"
+        url = f"https://api.twelvedata.com/time_series?symbol={stock}&interval=1day&start_date={format_five_days_ago + ' 15:00:00'}&end_date={today + ' 15:00:00'}&apikey={api_key}"
+
         response = requests.get(url).json()
         stock_data_list.append(response)
-        # stock_data_list.append(stock)
+        global_data_list.append(response)
 
-    # print(stock_data_list)    
     return stock_data_list
-    
-    # print(stock)
-    # url = f"https://api.twelvedata.com/quote?symbol={ticker_symbol}&apikey={api_key}"
-    # response = requests.get(url).json()
-    # name = response['name']
-    # exchange = response['exchange']
-    # currency = response['currency']
-    # datetime = response['datetime']
-    # high = response['high'][:-3]
-    # low = response['low'][:-3]
-    # open_price = response['open'][:-3]
-    # close_price = response['close'][:-3]
-    # percent_change = response['percent_change'][:-3]
-    # fifty_two_week_low = response['fifty_two_week']['low'][:-3]
-    # fifty_two_week_high = response['fifty_two_week']['high'][:-3]
-    # fifty_two_week_low_change = response['fifty_two_week']['low_change'][:-3]
-    # fifty_two_week_high_change = response['fifty_two_week']['high_change'][:-3]
-    # fifty_two_week_low_change_percent = response['fifty_two_week']['low_change_percent'][:-3]
-    # fifty_two_week_high_change_precent = response['fifty_two_week']['high_change_percent'][:-3]
 
-    # return response
 
-# get_stock_data(ticker, api_key)
+def make_charts():
 
+    for data in global_data_list:
+
+        df = pd.json_normalize(data, 'values')
+        df = df.iloc[::-1]
+        df.datetime = pd.to_datetime(df.datetime)
+        df = df.set_index('datetime')
+        df[['open', 'high', 'low', 'close', 'volume']] = df[[
+            'open', 'high', 'low', 'close', 'volume']].astype(float)
+
+        mpf.plot(df, type='line', volume=True, title=data['meta']['symbol'], ylabel='Price in USD', ylabel_lower='Volume')

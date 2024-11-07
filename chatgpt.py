@@ -1,9 +1,11 @@
-import constants
+from dotenv import load_dotenv
+import os
 from openai import OpenAI
 from stock_ticker import get_stock_data
 
+load_dotenv()
 client = OpenAI(
-    api_key=constants.OPENAI_API_KEY
+    api_key=os.getenv("OPENAI_API_KEY")
 )
 
 
