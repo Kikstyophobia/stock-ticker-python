@@ -11,9 +11,6 @@ load_dotenv()
 api_key = os.getenv("TWELVEDATA_API_KEY")
 
 
-global_data_list = []
-
-
 def get_stock_data(stock_list):
     stock_data_list = []
     today = datetime.today().strftime('%Y-%m-%d')
@@ -25,14 +22,13 @@ def get_stock_data(stock_list):
 
         response = requests.get(url).json()
         stock_data_list.append(response)
-        global_data_list.append(response)
 
     return stock_data_list
 
 
-def make_charts():
+def make_charts(stock_data_list):
 
-    for data in global_data_list:
+    for data in stock_data_list:
 
         df = pd.json_normalize(data, 'values')
         df = df.iloc[::-1]

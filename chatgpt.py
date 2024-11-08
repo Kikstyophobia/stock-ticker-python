@@ -9,9 +9,9 @@ client = OpenAI(
 )
 
 
-def chat_with_gpt(prompt, stock_list):
+def chat_with_gpt(prompt, data):
 
-    payload = prompt + f"{get_stock_data(stock_list)}"
+    payload = prompt + f"{data}"
 
     completion = client.chat.completions.create(
         model="gpt-4o",
